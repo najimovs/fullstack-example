@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser"
 import helmet from "helmet"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
+import morgan from "morgan"
 
 const PORT = process.env.PORT || 3_000
 
@@ -47,6 +48,12 @@ app.use( rateLimit( {
 	max: 100, // Max 100 requests per IP
 	message: "Too many requests, please try again later."
 } ) )
+
+/*
+	HTTP request logger middleware with a custom format,
+	logging method, URL, status code, response time, client IP, and user agent
+*/
+app.use( morgan( ":method :url :status :response-time ms [:remote-addr :user-agent]" ) )
 
 // ---ROUTES---
 
