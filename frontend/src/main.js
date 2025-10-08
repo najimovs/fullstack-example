@@ -24,7 +24,13 @@ function handleCredentialResponse( response ) {
 	const jwt = response.credential
 	const payload = parseJWT( jwt )
 
-	console.log( payload )
+	//
+
+	const h1 = document.getElementById( "user_name" )
+	const img = document.getElementById( "user_photo" )
+
+	h1.textContent = payload.given_name
+	img.src = payload.picture
 }
 
 function parseJWT( token ) {
