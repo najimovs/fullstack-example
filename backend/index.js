@@ -2,6 +2,7 @@ import express from "express"
 import cookieParser from "cookie-parser"
 import helmet from "helmet"
 import cors from "cors"
+import rateLimit from "express-rate-limit"
 
 const PORT = process.env.PORT || 3_000
 
@@ -35,6 +36,16 @@ app.use( cors( {
 	origin: [
 		"http://localhost:3001",
 	],
+} ) )
+
+/*
+	Rate limiting middleware to prevent abuse and brute-force attacks.
+	Limits each IP to 100 requests per 15-minute window.
+*/
+app.use( rateLimit( {
+	windowMs: 15 * 60 * 1_000, // 15 minutes
+	max: 100, // Max 100 requests per IP
+	message: "Too many requests, please try again later."
 } ) )
 
 // ---ROUTES---
