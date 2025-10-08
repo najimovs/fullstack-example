@@ -24,6 +24,8 @@ function handleCredentialResponse( response ) {
 	const jwt = response.credential
 	const payload = parseJWT( jwt )
 
+	console.log( jwt )
+
 	//
 
 	const h1 = document.getElementById( "user_name" )

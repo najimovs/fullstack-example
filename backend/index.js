@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit"
 import morgan from "morgan"
 
 const PORT = process.env.PORT || 3_000
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 
 const app = express()
 
@@ -61,6 +62,43 @@ app.get( "/health", ( req, res ) => res.send( {
 	status: "ok",
 	timestamp: new Date().toISOString(),
 } ) )
+
+// Sign-in with Google
+app.post( "/auth/google", async ( req, res ) => {
+
+	if ( !req.body || !req.body.token ) {
+
+		res.status( 400 ).end()
+
+		return
+	}
+
+	const { token } = req.body
+
+	const response = await fetch( `https://oauth2.googleapis.com/tokeninfo?id_token=${ token }` )
+
+	if ( !response.ok ) {
+
+		res.status( 401 ).end()
+
+		return
+	}
+
+	const payload = await response.json()
+
+	if ( payload.aud !== GOOGLE_CLIENT_ID ) {
+
+		res.status( 401 ).end()
+
+		return
+	}
+
+	res.status( 201 ).send( {
+		name: payload.name,
+		email: payload.email,
+		profile_picture: payload.picture,
+	} )
+} )
 
 // Run the server
 app.listen( PORT, "0.0.0.0", () => console.info( `Server ready at: ${ PORT }` ) )
