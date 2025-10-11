@@ -3,6 +3,7 @@ import "@app/css/main.css"
 window.onload = () => {
 
 	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+	const API_URL = import.meta.env.VITE_API_URL
 
 	google.accounts.id.initialize( {
 		client_id: GOOGLE_CLIENT_ID,
@@ -17,34 +18,20 @@ window.onload = () => {
 			size: "large",
 		}
 	)
-}
 
-function handleCredentialResponse( response ) {
+	async function handleCredentialResponse( { credential: token } ) {
 
-	const jwt = response.credential
-	const payload = parseJWT( jwt )
+		const response = await fetch( API_URL + "/auth/google", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify( { token } ),
+		} )
 
-	console.log( jwt )
+		if ( response.ok ) {
 
-	//
-
-	const h1 = document.getElementById( "user_name" )
-	const img = document.getElementById( "user_photo" )
-
-	h1.textContent = payload.given_name
-	img.src = payload.picture
-}
-
-function parseJWT( token ) {
-
-	const base64Url = token.split( "." )[ 1 ]
-	const base64 = base64Url.replace( /-/g, "+" ).replace( /_/g, "/" )
-	const jsonPayload = decodeURIComponent(
-		atob( base64 )
-			.split( "" )
-			.map( c => "%" + ( "00" + c.charCodeAt( 0 ).toString( 16 ) ).slice( - 2 ) )
-			.join( "" )
-	)
-
-	return JSON.parse( jsonPayload )
+			console.log( await response.json() )
+		}
+	}
 }
