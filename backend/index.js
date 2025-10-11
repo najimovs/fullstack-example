@@ -35,9 +35,7 @@ app.use( helmet() )
 */
 app.use( cors( {
 	credentials: true,
-	origin: [
-		"http://localhost:3001",
-	],
+	origin: "http://localhost:3001",
 } ) )
 
 /*
@@ -92,6 +90,12 @@ app.post( "/auth/google", async ( req, res ) => {
 
 		return
 	}
+
+	res.cookie( "pchinni", "Taplyonni", {
+		maxAge: 1_000 * 60,
+		secure: false,
+		httpOnly: true,
+	} )
 
 	res.status( 201 ).send( {
 		name: payload.name,

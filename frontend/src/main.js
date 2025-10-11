@@ -23,6 +23,7 @@ window.onload = () => {
 
 		const response = await fetch( API_URL + "/auth/google", {
 			method: "POST",
+			credentials: "include", // omit
 			headers: {
 				"Content-Type": "application/json",
 			},
