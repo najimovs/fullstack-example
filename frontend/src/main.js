@@ -9,8 +9,8 @@ const canvas = document.getElementById( "gl" )
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color( 0x000066 )
-const camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 10_000 )
-camera.position.set( 0, 1, 10 )
+const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10_000 )
+camera.position.set( 50, 50, 50 )
 const renderer = new THREE.WebGLRenderer( { canvas, antialias: true, } )
 
 renderer.setPixelRatio( window.devicePixelRatio )
@@ -31,7 +31,7 @@ const textureLoader = new THREE.TextureLoader().setPath( "/assets" )
 
 const grassTexture = textureLoader.load( "/grass.jpg", t => t.colorSpace = THREE.SRGBColorSpace )
 
-const ground = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshBasicMaterial( { map: grassTexture } ) )
+const ground = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { map: grassTexture } ) )
 ground.rotateX( - Math.PI / 2 )
 scene.add( ground )
 
@@ -60,7 +60,33 @@ function render() {
 
 glbLoader.load( "/cb.glb", glb => {
 
-	scene.add( glb.scene )
+	const cp = glb.scene
+
+	let y = 0
+
+	const time = new THREE.Clock()
+
+	const animation = () => {
+
+		const t = time.getElapsedTime()
+
+		const speed = 0.15
+
+		if ( Math.floor( t % 2 ) === 0 ) {
+
+			cp.position.z = cp.position.z + speed
+		}
+		else {
+
+			cp.position.z = cp.position.z - speed
+		}
+
+		requestAnimationFrame( animation )
+	}
+
+	animation()
+
+	scene.add( cp )
 } )
 
 /*

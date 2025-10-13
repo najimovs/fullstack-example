@@ -4,9 +4,11 @@ import helmet from "helmet"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
 import morgan from "morgan"
+import jwt from "jsonwebtoken"
 
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
+const JWT_SECRET = process.env.JWT_SECRET
 
 const app = express()
 
@@ -54,12 +56,40 @@ app.use( rateLimit( {
 */
 app.use( morgan( ":method :url :status :response-time ms [:remote-addr :user-agent]" ) )
 
+/*
+	Protect routes
+*/
+
+function privateRoute( req, res, next ) {
+
+	if ( !req.cookies || !req.cookies.session_id ) {
+
+		return res.status( 401 ).send( { error: "Unauthorized" } )
+	}
+
+	try {
+
+		jwt.verify( req.cookies.session_id, JWT_SECRET )
+
+		next()
+	}
+	catch( error ) {
+
+		return res.status( 401 ).send( { error: "Unauthorized" } )
+	}
+}
+
 // ---ROUTES---
 
 app.get( "/health", ( req, res ) => res.send( {
 	status: "ok",
 	timestamp: new Date().toISOString(),
 } ) )
+
+app.get( "/some-data", privateRoute, async ( req, res ) => {
+
+	res.send( { some: "Data" } )
+} )
 
 // Sign-in with Google
 app.post( "/auth/google", async ( req, res ) => {
@@ -91,8 +121,14 @@ app.post( "/auth/google", async ( req, res ) => {
 		return
 	}
 
-	res.cookie( "pchinni", "Taplyonni", {
-		maxAge: 1_000 * 60,
+	const JWT_TOKEN = jwt.sign( {
+		email: payload.email,
+	}, JWT_SECRET, {
+		expiresIn: "7d",
+	} )
+
+	res.cookie( "session_id", JWT_TOKEN, {
+		maxAge: 1_000 * 60 * 60 * 24 * 7,
 		secure: false,
 		httpOnly: true,
 	} )
