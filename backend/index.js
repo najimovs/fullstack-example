@@ -9,9 +9,11 @@ import morgan from "morgan"
 import jwt from "jsonwebtoken"
 import multer from "multer"
 import { customAlphabet } from "nanoid"
-
+import { query } from "./db.js"
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
+
+console.log( await query( `SELECT 'Hello' message` ) )
 
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
