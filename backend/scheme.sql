@@ -12,3 +12,5 @@ create table assets (
 	description text null,
 	user_id int references users(id) on delete cascade on update cascade
 );
+
+alter table assets add column resource_path varchar(16) not null;
