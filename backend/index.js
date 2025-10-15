@@ -20,9 +20,6 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const JWT_SECRET = process.env.JWT_SECRET
 
 const nanoid = customAlphabet( "abcdefghijklmnopqrstuvwxyz", 16 )
-
-const assets = new Map()
-
 const app = express()
 
 /*
@@ -81,12 +78,9 @@ const storage = multer.diskStorage( {
 	filename: ( req, file, cb ) => {
 
 		const id = nanoid()
-
 		const filename = id + path.extname( file.originalname )
 
-		assets.set( id, {
-			path: filename,
-		} )
+		query( `insert into assets(file_path, user_id, resource_path) values($1, $2, $3)`, filename, 1, id )
 
 		cb( null, filename )
 	},
@@ -119,13 +113,13 @@ function privateRoute( req, res, next ) {
 
 // ---ROUTES---
 
-app.get( "/view/:fileID", ( req, res ) => {
+app.get( "/view/:resource_path", ( req, res ) => {
 
-	const { fileID } = req.params
+	const { resource_path } = req.params
 
-	if ( assets.has( fileID ) ) {
+	if ( assets.has( resource_path ) ) {
 
-		const file = assets.get( fileID )
+		const file = assets.get( resource_path )
 
 		const filePath = path.join( __dirname, "assets", file.path )
 
