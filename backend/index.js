@@ -13,7 +13,7 @@ import { query } from "./db.js"
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
 
-console.log( await query( `SELECT 'Hello' message` ) )
+console.log( await query( `select * from assets` ) )
 
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
