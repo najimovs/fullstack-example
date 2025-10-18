@@ -13,8 +13,6 @@ import { query } from "./db.js"
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
 
-console.log( await query( `select * from assets` ) )
-
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const JWT_SECRET = process.env.JWT_SECRET
@@ -113,26 +111,28 @@ function privateRoute( req, res, next ) {
 
 // ---ROUTES---
 
-app.get( "/view/:resource_path", ( req, res ) => {
+app.get( "/view/:resource_path", async ( req, res ) => {
 
 	const { resource_path } = req.params
 
-	if ( assets.has( resource_path ) ) {
+	const rows = await query( `select * from assets where resource_path = $1`, resource_path )
 
-		const file = assets.get( resource_path )
+	if ( !rows.length ) {
 
-		const filePath = path.join( __dirname, "assets", file.path )
+		res.status( 404 ).end()
 
-		return res.sendFile( filePath, err => {
-
-			if ( err ) {
-
-				res.status( 500 ).send( "Error sending file" )
-			}
-		} )
+		return
 	}
 
-	res.status( 404 ).end()
+	const filePath = path.join( __dirname, "assets", rows[ 0 ].file_path )
+
+	return res.sendFile( filePath, err => {
+
+		if ( err ) {
+
+			res.status( 500 ).send( "Error sending file" )
+		}
+	} )
 } )
 
 app.post( "/upload", [ upload.single( "file" ), privateRoute ], ( req, res ) => {
@@ -143,6 +143,11 @@ app.post( "/upload", [ upload.single( "file" ), privateRoute ], ( req, res ) => 
 	}
 
 	res.status( 201 ).send( { message: "ok" } )
+} )
+
+app.get( "/assets", async ( req, res ) => {
+
+	res.send( await query( `select name, resource_path from assets` ) )
 } )
 
 app.get( "/health", ( req, res ) => res.send( {

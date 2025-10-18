@@ -16,6 +16,27 @@ async function handleRoutes() {
 
 		console.log( "HOME" )
 	}
+	else if ( pathname === "/assets" ) {
+
+		const repsonse = await fetch( API_URL + "/assets" )
+		const assets = await repsonse.json()
+
+		const ul = document.createElement( "ul" )
+
+		for ( const asset of assets ) {
+
+			const li = document.createElement( "li" )
+			const a = document.createElement( "a" )
+			a.href = "/edaamlqvpgrfohis"
+			a.textContent = `Name ${ asset.name} `
+
+			li.appendChild( a )
+
+			ul.appendChild( li )
+		}
+
+		document.body.appendChild( ul )
+	}
 	else if ( pathname === "/upload" ) {
 
 		upload()
