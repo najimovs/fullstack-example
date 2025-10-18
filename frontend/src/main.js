@@ -2,6 +2,7 @@ import "@app/css/main.css"
 import * as THREE from "three"
 import { OrbitControls } from "three/addons/controls/OrbitControls"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader"
+import { upload } from "./upload"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -10,16 +11,30 @@ handleRoutes()
 async function handleRoutes() {
 
 	const { pathname } = window.location
-	const fileID = pathname.substr( 1 )
-	const response = await fetch( API_URL + "/view/" + fileID )
 
-	if ( response.ok ) {
+	if ( pathname === "/" ) {
 
-		run( { arrayBuffer: await response.arrayBuffer() } )
+		console.log( "HOME" )
+	}
+	else if ( pathname === "/upload" ) {
+
+		upload()
 	}
 	else {
 
-		console.log( "DEFUALT" )
+		const fileID = pathname.substr( 1 )
+		const response = await fetch( API_URL + "/view/" + fileID )
+
+		if ( response.ok ) {
+
+			run( { arrayBuffer: await response.arrayBuffer() } )
+		}
+		else {
+
+			console.log( "DEFUALT" )
+		}
+
+		console.log( fileID )
 	}
 }
 
@@ -82,42 +97,3 @@ async function run( { arrayBuffer } ) {
 
 	await glbLoader.parse( arrayBuffer, "", glb => scene.add( glb.scene ) )
 }
-
-/*
-window.onload = () => {
-
-	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
-	const API_URL = import.meta.env.VITE_API_URL
-
-	google.accounts.id.initialize( {
-		client_id: GOOGLE_CLIENT_ID,
-		callback: handleCredentialResponse,
-		auto_select: false,
-	} )
-
-	google.accounts.id.renderButton(
-		document.getElementById( "g_id_signin" ),
-		{
-			theme: "outline",
-			size: "large",
-		}
-	)
-
-	async function handleCredentialResponse( { credential: token } ) {
-
-		const response = await fetch( API_URL + "/auth/google", {
-			method: "POST",
-			credentials: "include", // omit
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify( { token } ),
-		} )
-
-		if ( response.ok ) {
-
-			console.log( await response.json() )
-		}
-	}
-}
-*/
