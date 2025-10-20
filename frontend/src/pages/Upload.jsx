@@ -53,12 +53,16 @@ export default function () {
 			formData.append( "file", file, file.name )
 
 			try {
+
 				const response = await fetch( API_URL + "/upload", {
 					method: "POST",
 					credentials: "include",
 					body: formData,
 				} )
-				console.log( response )
+
+				const json = await response.json()
+
+				console.log( json )
 			}
 			catch( error ) {
 

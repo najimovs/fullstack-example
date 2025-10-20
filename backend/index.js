@@ -20,8 +20,6 @@ const JWT_SECRET = process.env.JWT_SECRET
 const nanoid = customAlphabet( "abcdefghijklmnopqrstuvwxyz", 16 )
 const app = express()
 
-console.log( await query( `select * from assets` ) )
-
 /*
 	Parses incoming JSON payloads from HTTP requests (e.g., POST/PUT data)
 	and makes them available in req.body as JavaScript objects.
@@ -137,14 +135,16 @@ app.get( "/view/:resource_path", async ( req, res ) => {
 	} )
 } )
 
-app.post( "/upload", [ upload.single( "file" ), privateRoute ], ( req, res ) => {
+app.post( "/upload", [ upload.single( "file" ), privateRoute ], async ( req, res ) => {
 
 	if ( !req.file ) {
 
 		return res.status( 400 ).send( { message: "No file uploaded!" } )
 	}
 
-	res.status( 201 ).send( { message: "ok" } )
+	const [ asset ] = await query( `select * from assets where id = (select max(id) from assets)` )
+
+	res.status( 201 ).send( asset )
 } )
 
 app.get( "/assets", async ( req, res ) => {
