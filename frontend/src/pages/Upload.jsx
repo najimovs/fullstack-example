@@ -1,13 +1,14 @@
 import { useRef, useEffect } from "react"
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const API_URL = import.meta.env.VITE_API_URL
+
 export default function () {
 
+	const inputRef = useRef()
 	const signInRef = useRef()
 
 	useEffect( () => {
-
-		const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
-		const API_URL = import.meta.env.VITE_API_URL
 
 		google.accounts.id.initialize( {
 			client_id: GOOGLE_CLIENT_ID,
@@ -44,5 +45,27 @@ export default function () {
 
 	return <>
 		<div ref={ signInRef }></div>
+		<input ref={ inputRef } onChange={ async e => {
+
+			const file = e.target.files[ 0 ]
+
+			const formData = new FormData()
+			formData.append( "file", file, file.name )
+
+			try {
+				const response = await fetch( API_URL + "/upload", {
+					method: "POST",
+					credentials: "include",
+					body: formData,
+				} )
+				console.log( response )
+			}
+			catch( error ) {
+
+				console.error( error )
+			}
+
+		} } type="file" />
+		<button onClick={ () => inputRef.current.click() }>Upload (.GLB, .GLTF) file</button>
 	</>
 }
