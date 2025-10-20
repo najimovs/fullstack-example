@@ -14,6 +14,7 @@ export default defineConfig( {
 	resolve: {
 		alias: {
 			"@app": path.resolve( __dirname, "./src/app" ),
+			"@pages": path.resolve( __dirname, "./src/pages" ),
 			"@lib": path.resolve( __dirname, "./src/library" ),
 		},
 	},
