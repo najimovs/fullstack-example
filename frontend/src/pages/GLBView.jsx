@@ -6,6 +6,6 @@ export default function () {
 	const { glbID } = useParams()
 
 	return ( <>
-		<GLBView modelUrl="/assets/glb/cb.glb" />
+		<GLBView modelUrl={ `http://localhost:3000/view/` + glbID } />
 	</> )
 }
