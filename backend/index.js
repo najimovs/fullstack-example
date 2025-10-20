@@ -20,6 +20,8 @@ const JWT_SECRET = process.env.JWT_SECRET
 const nanoid = customAlphabet( "abcdefghijklmnopqrstuvwxyz", 16 )
 const app = express()
 
+console.log( await query( `select * from assets` ) )
+
 /*
 	Parses incoming JSON payloads from HTTP requests (e.g., POST/PUT data)
 	and makes them available in req.body as JavaScript objects.
