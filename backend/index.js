@@ -215,6 +215,13 @@ app.post( "/auth/google", async ( req, res ) => {
 		return
 	}
 
+	const [ user ] = await query( `select id from users where email = $1`, payload.email )
+
+	if ( !user ) {
+
+		await query( `insert into users (email, password) values ($1, $2)`, payload.email, "123" )
+	}
+
 	const JWT_TOKEN = jwt.sign( {
 		email: payload.email,
 	}, JWT_SECRET, {
