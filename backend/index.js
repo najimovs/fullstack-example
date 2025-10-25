@@ -8,11 +8,12 @@ import rateLimit from "express-rate-limit"
 import morgan from "morgan"
 import jwt from "jsonwebtoken"
 import multer from "multer"
-import { customAlphabet } from "nanoid"
+import { nanoid as randomPassword, customAlphabet } from "nanoid"
 import { query } from "./db.js"
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
 
+// console.log( await query( "delete from assets" ) )
 // console.log( await query( "select * from users" ) )
 // console.log( await query( `UPDATE users SET email = $1`, 'najimovsbox@gmail.com' ) )
 
@@ -219,7 +220,7 @@ app.post( "/auth/google", async ( req, res ) => {
 
 	if ( !user ) {
 
-		await query( `insert into users (email, password) values ($1, $2)`, payload.email, "123" )
+		await query( `insert into users (email, password) values ($1, $2)`, payload.email, randomPassword() )
 	}
 
 	const JWT_TOKEN = jwt.sign( {
