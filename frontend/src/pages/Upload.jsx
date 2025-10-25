@@ -95,6 +95,10 @@ export default function () {
 
 				navigate( `/${ asset.resource_path }` )
 			}
+			else {
+
+				setErrorMessage( response.statusText )
+			}
 		}
 		catch( error ) {
 
