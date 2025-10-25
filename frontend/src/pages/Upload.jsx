@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 const API_URL = import.meta.env.VITE_API_URL
@@ -7,6 +7,9 @@ export default function () {
 
 	const inputRef = useRef()
 	const signInRef = useRef()
+	const [ name, setName ] = useState( null )
+	const [ description, setDescription ] = useState( null )
+	const [ file, setFile ] = useState( null )
 
 	useEffect( () => {
 
@@ -43,33 +46,61 @@ export default function () {
 
 	}, [] )
 
+	async function upload() {
+
+		// TODO: Check inputs
+
+		const formData = new FormData()
+		formData.append( "name", name )
+		formData.append( "description", description )
+		formData.append( "file", file, file.name )
+
+		try {
+
+			const response = await fetch( API_URL + "/upload", {
+				method: "POST",
+				credentials: "include",
+				body: formData,
+			} )
+
+			const json = await response.json()
+
+			console.log( json )
+		}
+		catch( error ) {
+
+			console.error( error )
+		}
+	}
+
 	return <>
-		<div ref={ signInRef }></div>
-		<input ref={ inputRef } onChange={ async e => {
 
-			const file = e.target.files[ 0 ]
+		<div id="auth-form">
+			<div ref={ signInRef }></div>
+		</div>
 
-			const formData = new FormData()
-			formData.append( "file", file, file.name )
+		<div id="upload-form">
+			<input
+				type="text"
+				placeholder="Name"
+				onChange={ e => setName( e.target.value ) }
+			/>
+			<textarea
+				placeholder="Description"
+				onChange={ e => setDescription( e.target.value ) }
+			/>
+			<input
+				type="file" 
+				ref={ inputRef }
+				onChange={ e => {
 
-			try {
+					const file = e.target.files[ 0 ]
 
-				const response = await fetch( API_URL + "/upload", {
-					method: "POST",
-					credentials: "include",
-					body: formData,
-				} )
-
-				const json = await response.json()
-
-				console.log( json )
-			}
-			catch( error ) {
-
-				console.error( error )
-			}
-
-		} } type="file" />
-		<button onClick={ () => inputRef.current.click() }>Upload (.GLB, .GLTF) file</button>
+					setFile( file )
+				} }
+			/>
+			<button onClick={ () => inputRef.current.click() }>Choose file (.GLB, .GLTF) file</button>
+			<button onClick={ upload }>Upload</button>
+		</div>
 	</>
 }
