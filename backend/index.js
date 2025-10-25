@@ -115,12 +115,22 @@ app.get( "/view/:resource_path", async ( req, res ) => {
 
 	const { resource_path } = req.params
 
-	const rows = await query( `select * from assets where resource_path = $1`, resource_path )
+	let rows = []
 
-	if ( !rows.length ) {
+	try {
 
-		res.status( 404 ).end()
+		rows = await query( `select * from assets where resource_path = $1`, resource_path )
 
+		if ( !rows.length ) {
+
+			res.status( 404 ).end()
+
+			return
+		}
+	}
+	catch( error ) {
+
+		res.status( 503 ).end()
 		return
 	}
 
