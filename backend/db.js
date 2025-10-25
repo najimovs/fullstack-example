@@ -11,9 +11,9 @@ const pool = new Pool( {
 	connectionTimeoutMillis: 2_000,
 } )
 
-let client = null
-
 export async function query( sql, ...data ) {
+
+	let client = null
 
 	try {
 

@@ -77,8 +77,9 @@ const storage = multer.diskStorage( {
 
 		const id = nanoid()
 		const filename = id + path.extname( file.originalname )
+		const { name, description } = req.body
 
-		query( `insert into assets(file_path, user_id, resource_path) values($1, $2, $3)`, filename, 1, id )
+		query( `insert into assets(file_path, user_id, resource_path, name, description) values($1, $2, $3, $4, $5)`, filename, 1, id, name, description )
 
 		cb( null, filename )
 	},
