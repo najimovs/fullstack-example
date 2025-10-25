@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react"
+import { useNavigate } from "react-router"
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 const API_URL = import.meta.env.VITE_API_URL
@@ -10,6 +11,8 @@ export default function () {
 	const [ name, setName ] = useState( null )
 	const [ description, setDescription ] = useState( null )
 	const [ file, setFile ] = useState( null )
+
+	const navigate = useNavigate()
 
 	useEffect( () => {
 
@@ -63,9 +66,12 @@ export default function () {
 				body: formData,
 			} )
 
-			const json = await response.json()
+			if ( response.ok ) {
 
-			console.log( json )
+				const asset = await response.json()
+
+				navigate( `/${ asset.resource_path }` )
+			}
 		}
 		catch( error ) {
 
