@@ -13,6 +13,9 @@ import { query } from "./db.js"
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
 
+// console.log( await query( "select * from users" ) )
+// console.log( await query( `UPDATE users SET email = $1`, 'najimovsbox@gmail.com' ) )
+
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const JWT_SECRET = process.env.JWT_SECRET
@@ -79,7 +82,7 @@ const storage = multer.diskStorage( {
 		const filename = id + path.extname( file.originalname )
 		const { name, description } = req.body
 
-		query( `insert into assets(file_path, user_id, resource_path, name, description) values($1, $2, $3, $4, $5)`, filename, 1, id, name, description )
+		query( `insert into assets(file_path, user_id, resource_path, name, description) values($1, $2, $3, $4, $5)`, filename, req.user.id, id, name, description )
 
 		cb( null, filename )
 	},
@@ -91,7 +94,7 @@ const upload = multer( { storage } )
 	Protect routes
 */
 
-function privateRoute( req, res, next ) {
+async function privateRoute( req, res, next ) {
 
 	if ( !req.cookies || !req.cookies.session_id ) {
 
@@ -100,7 +103,16 @@ function privateRoute( req, res, next ) {
 
 	try {
 
-		jwt.verify( req.cookies.session_id, JWT_SECRET )
+		const payload = jwt.verify( req.cookies.session_id, JWT_SECRET )
+
+		const [ user ] = await query( `select id from users where email = $1`, payload.email )
+
+		if ( !user ) {
+
+			return res.status( 401 ).send( { error: "Unauthorized" } )
+		}
+
+		req.user = user
 
 		next()
 	}
@@ -146,7 +158,7 @@ app.get( "/view/:resource_path", async ( req, res ) => {
 	} )
 } )
 
-app.post( "/upload", [ upload.single( "file" ), privateRoute ], async ( req, res ) => {
+app.post( "/upload", [ privateRoute, upload.single( "file" ) ], async ( req, res ) => {
 
 	if ( !req.file ) {
 
