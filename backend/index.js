@@ -14,8 +14,10 @@ import { query } from "./db.js"
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) )
 
 // console.log( await query( "delete from assets" ) )
-// console.log( await query( "select * from users" ) )
+console.log( await query( "select * from users" ) )
+// query( 'update users set is_admin = true where id = 4' )
 // console.log( await query( `UPDATE users SET email = $1`, 'najimovsbox@gmail.com' ) )
+// await query( `alter table users add column is_admin boolean default false` )
 
 const PORT = process.env.PORT || 3_000
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
@@ -106,7 +108,7 @@ async function privateRoute( req, res, next ) {
 
 		const payload = jwt.verify( req.cookies.session_id, JWT_SECRET )
 
-		const [ user ] = await query( `select id from users where email = $1`, payload.email )
+		const [ user ] = await query( `select id, is_admin from users where email = $1`, payload.email )
 
 		if ( !user ) {
 
@@ -124,6 +126,18 @@ async function privateRoute( req, res, next ) {
 }
 
 // ---ROUTES---
+
+app.get( "/dashboard/assets", privateRoute, async ( req, res ) => {
+
+	if ( req.user.is_admin ) {
+
+		res.send( await query( `select * from assets` ) )
+	}
+	else {
+
+		res.status( 403 ).end()
+	}
+} )
 
 app.get( "/view/:resource_path", async ( req, res ) => {
 

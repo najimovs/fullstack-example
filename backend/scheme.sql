@@ -2,6 +2,7 @@ create table users (
 	id serial primary key,
 	email varchar(255) not null unique,
 	password varchar(64) not null,
+	is_admin boolean default false,
 	created_at timestamp default current_timestamp
 );
 
@@ -14,3 +15,4 @@ create table assets (
 );
 
 alter table assets add column resource_path varchar(16) not null;
+alter table users add column is_admin boolean default false;
