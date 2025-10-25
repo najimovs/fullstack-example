@@ -11,8 +11,15 @@ export default function () {
 	const [ name, setName ] = useState( null )
 	const [ description, setDescription ] = useState( null )
 	const [ file, setFile ] = useState( null )
+	const [ errorMessage, setErrorMessage ] = useState( null )
 
 	const navigate = useNavigate()
+
+	useEffect( () => {
+
+		setErrorMessage( null )
+
+	}, [ name, description, file ] )
 
 	useEffect( () => {
 
@@ -51,7 +58,23 @@ export default function () {
 
 	async function upload() {
 
-		// TODO: Check inputs
+		if ( !name ) {
+
+			setErrorMessage( "Please type name" )
+			return
+		}
+
+		if ( !description ) {
+
+			setErrorMessage( "Please type description" )
+			return
+		}
+
+		if ( !file || ( file && !file.name ) ) {
+
+			setErrorMessage( "Please choose (.GLB, .GLTF) file" )
+			return
+		}
 
 		const formData = new FormData()
 		formData.append( "name", name )
@@ -107,6 +130,7 @@ export default function () {
 			/>
 			<button onClick={ () => inputRef.current.click() }>Choose file (.GLB, .GLTF) file</button>
 			<button onClick={ upload }>Upload</button>
+			{ errorMessage && <p className="error">{ errorMessage }</p> }
 		</div>
 	</>
 }

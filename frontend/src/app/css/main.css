@@ -31,11 +31,15 @@ input[type="file"] {
 }
 
 #upload-form {
-	background: blue;
-	padding: 1rem;
+	width: 100%;
+	min-width: 16rem;
+	max-width: 32rem;
+	background: black;
+	border-radius: 0.5rem;
+	padding: 2rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 1rem;
 }
 
 #upload-form textarea {
@@ -51,4 +55,8 @@ input[type="file"] {
 #upload-form button {
 	padding: 0.5rem;
 	cursor: pointer;
+}
+
+#upload-form p.error {
+	color: red;
 }
